@@ -5,19 +5,23 @@ if [ $1 ] && [ $2 ] && [ -d $1 ]; then
     OUT_PATH=$(realpath $2);
 else
     echo "Usage: $0 [cpio folder path] [cpio result path]";
-    exit
+    exit 1
 fi
 
 if [ -d $2 ]; then
     echo "Usage: $0 [cpio folder path] [cpio result path]";
-    exit
+    exit 1
 fi
 
-ORIGDIR=`pwd`;
+ORIGDIR=`pwd`
 
-cd $CPIO_PATH;
+cd $CPIO_PATH
 
-echo "Working.."
-find . | cpio -H newc -ov -F $OUT_PATH 2>/dev/null
+exec find . | cpio -H newc -ov -F $OUT_PATH 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "Packing failed."
+    exit 1
+fi
 
 echo "Packed path $OUT_PATH"
+exit 0
